@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Le Labo des savoirs — Tableau récapitulatif de conjugaison</title>
+<style>
+*{box-sizing:border-box}
+:root{--navy:#0b1f3a;--blue:#12a9e8;--bg:#eef3f8;--line:#111;--shade:#d9d9d9}
+body{margin:0;background:var(--bg);color:#111;font-family:Georgia,"Times New Roman",serif}
+.brandbar{background:var(--navy);color:#fff;padding:12px 22px;display:flex;align-items:center;gap:16px;font-family:Arial,Helvetica,sans-serif}
+.brandbar img{width:66px;height:66px;object-fit:contain;background:#fff;border-radius:14px;padding:3px}
+.brand-title{font-size:30px;font-weight:900}.brand-sub{font-size:18px;margin-top:4px;opacity:.9}
+.page{max-width:1500px;margin:18px auto;background:#fff;padding:22px 28px 30px;box-shadow:0 2px 14px #0002}
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;font-size:18px;margin-bottom:4px}
+.top .right{text-align:right}.top input{border:0;border-bottom:1px solid #555;font:inherit;width:210px;outline:none}
+h1{text-align:center;font-size:25px;text-decoration:underline;margin:0 0 2px}
+.verb{text-align:center;font-size:20px;font-weight:bold;margin-bottom:10px}
+.controls,.selection{font-family:Arial,Helvetica,sans-serif;background:#f6f7f9;border:1px solid #c9d3df;border-radius:9px;padding:12px;margin-bottom:13px}
+.controls{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+select,button{font:inherit;padding:7px 11px;border-radius:6px;border:1px solid #9aa2ad}
+button{background:#e9edf2;font-weight:bold;cursor:pointer}button.primary{background:#244fc7;color:#fff;border-color:#244fc7}
+#score{font-weight:bold;margin-left:auto}
+.selection-title{font-weight:800;margin-bottom:7px}.selection-actions{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:9px}
+.selection-actions button{font-size:13px;padding:6px 9px}.selection-actions .main{background:var(--navy);color:#fff}
+.selection-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.group-title{font-weight:800;color:#52667d;margin:2px 0 5px}
+.choices{display:flex;flex-wrap:wrap;gap:5px 12px}.choice{display:inline-flex;align-items:center;gap:4px;font-size:13px;cursor:pointer}
+.choice input{width:15px;height:15px;accent-color:#244fc7}
+.table-wrap{overflow-x:auto}
+.worksheet{border-collapse:collapse;width:100%;table-layout:fixed;min-width:920px}
+.worksheet th,.worksheet td{border:2px solid var(--line);padding:0;text-align:center}
+.worksheet .group{font-size:20px;height:31px;font-weight:bold}.worksheet .sub{font-size:17px;height:27px;font-style:italic;font-weight:bold;vertical-align:middle}
+.worksheet .upper-cell{height:174px;background:#fff;vertical-align:top}
+.worksheet .lower-head{height:50px;background:var(--shade);font-size:17px;font-style:italic;font-weight:bold}
+.worksheet .lower-cell{height:198px;background:var(--shade);vertical-align:top}.worksheet .inactive{background:#f3f3f3!important;color:#999}.worksheet .inactive::after{content:"";}
+.worksheet textarea{display:block;width:100%;height:100%;resize:none;border:0;outline:none;background:transparent;text-align:center;font:17px/1.45 Arial,Helvetica,sans-serif;padding:13px 6px}
+.worksheet textarea:focus{background:#eef5ff;box-shadow:inset 0 0 0 2px #3767e8}
+.worksheet textarea.correct{background:#d9f4df!important}.worksheet textarea.wrong{background:#ffdede!important}.worksheet textarea.answer{background:#fff0b8!important}
+.worksheet .imp-group{font-size:18px;height:29px}.worksheet .imp-sub{font-size:16px;height:28px;font-style:italic;font-weight:bold}
+.worksheet .imp-cell{height:76px;background:#fff;vertical-align:top}.worksheet .imp-cell.shade{background:var(--shade)}
+.hint{font:13px Arial,sans-serif;color:#555;margin-top:9px}
+@media(max-width:850px){.page{margin:0;padding:12px}.brand-title{font-size:23px}.brand-sub{font-size:14px}.selection-grid{grid-template-columns:1fr}}
+@media print{body{background:#fff}.brandbar,.controls,.selection,.hint{display:none!important}.page{box-shadow:none;margin:0;padding:0;max-width:none}h1{font-size:22px}.verb{margin-bottom:5px}.worksheet{min-width:0}.worksheet textarea{font-size:14px}}
+</style>
+</head>
+<body>
+<div class="brandbar"><img src="logo-labo-des-savoirs.png" alt="Le Labo des savoirs"><div><div class="brand-title">Le Labo des savoirs</div><div class="brand-sub">Apprendre · Découvrir · Comprendre · S’amuser</div></div></div>
+<div class="page">
+<div class="top"><div>Nom : <input id="nom"></div><div>Classe : <input id="classe" style="width:100px"></div><div class="right">/18</div></div>
+<h1>TABLEAU RÉCAPITULATIF de CONJUGAISON</h1>
+<div class="verb">Verbe : <span id="verbName">être</span></div>
+<div class="controls">
+<label for="verbSelect"><b>Choisir le verbe :</b></label><select id="verbSelect"></select>
+<button class="primary" id="checkBtn" type="button">✓ Vérifier</button>
+<button id="answerBtn" type="button">Afficher les réponses</button>
+<button id="resetBtn" type="button">↻ Recommencer</button>
+<button id="printBtn" type="button">🖨 Imprimer</button><span id="score">Score : —</span>
+</div>
+<div class="selection">
+<div class="selection-title">Temps et modes à travailler</div>
+<div class="selection-actions">
+<button class="main" id="allBtn" type="button">Tout sélectionner</button>
+<button id="noneBtn" type="button">Tout désélectionner</button>
+<button id="personalBtn" type="button">Modes personnels</button>
+<button id="impersonalBtn" type="button">Modes impersonnels</button>
+</div>
+<div class="selection-grid">
+<div><div class="group-title">Modes personnels</div><div id="personalChoices" class="choices"></div></div>
+<div><div class="group-title">Modes impersonnels</div><div id="impersonalChoices" class="choices"></div></div>
+</div>
+</div>
+<div class="table-wrap"><div id="tables"></div></div>
+<div class="hint">Dans chaque grande case, écris les formes les unes sous les autres : 6 formes pour un temps conjugué, 3 pour l’impératif et 1 pour un mode impersonnel.</div>
+</div>
+<script>
+const P=["je / j'","tu","il / elle","nous","vous","ils / elles"];
+const verbs={
+"être":{p:["suis","es","est","sommes","êtes","sont"],i:["étais","étais","était","étions","étiez","étaient"],f:["serai","seras","sera","serons","serez","seront"],ps:["fus","fus","fut","fûmes","fûtes","furent"],pc:["ai été","as été","a été","avons été","avez été","ont été"],pq:["avais été","avais été","avait été","avions été","aviez été","avaient été"],fa:["aurai été","auras été","aura été","aurons été","aurez été","auront été"],pa:["eus été","eus été","eut été","eûmes été","eûtes été","eurent été"],sp:["sois","sois","soit","soyons","soyez","soient"],si:["fusse","fusses","fût","fussions","fussiez","fussent"],cp:["serais","serais","serait","serions","seriez","seraient"],cpa:["aurais été","aurais été","aurait été","aurions été","auriez été","auraient été"],imp:["sois","soyons","soyez"],impp:["aie été","ayons été","ayez été"],inf:["être"],infp:["avoir été"],part:["étant"],partp:["été"],ger:["en étant"],gerp:["en ayant été"]},
+"avoir":{p:["ai","as","a","avons","avez","ont"],i:["avais","avais","avait","avions","aviez","avaient"],f:["aurai","auras","aura","aurons","aurez","auront"],ps:["eus","eus","eut","eûmes","eûtes","eurent"],pc:["ai eu","as eu","a eu","avons eu","avez eu","ont eu"],pq:["avais eu","avais eu","avait eu","avions eu","aviez eu","avaient eu"],fa:["aurai eu","auras eu","aura eu","aurons eu","aurez eu","auront eu"],pa:["eus eu","eus eu","eut eu","eûmes eu","eûtes eu","eurent eu"],sp:["aie","aies","ait","ayons","ayez","aient"],si:["eusse","eusses","eût","eussions","eussiez","eussent"],cp:["aurais","aurais","aurait","aurions","auriez","auraient"],cpa:["aurais eu","aurais eu","aurait eu","aurions eu","auriez eu","auraient eu"],imp:["aie","ayons","ayez"],impp:["aie eu","ayons eu","ayez eu"],inf:["avoir"],infp:["avoir eu"],part:["ayant"],partp:["eu"],ger:["en ayant"],gerp:["en ayant eu"]},
+"aller":{p:["vais","vas","va","allons","allez","vont"],i:["allais","allais","allait","allions","alliez","allaient"],f:["irai","iras","ira","irons","irez","iront"],ps:["allai","allas","alla","allâmes","allâtes","allèrent"],pc:["suis allé(e)","es allé(e)","est allé(e)","sommes allé(e)s","êtes allé(e)(s)","sont allé(e)s"],pq:["étais allé(e)","étais allé(e)","était allé(e)","étions allé(e)s","étiez allé(e)(s)","étaient allé(e)s"],fa:["serai allé(e)","seras allé(e)","sera allé(e)","serons allé(e)s","serez allé(e)(s)","seront allé(e)s"],pa:["fus allé(e)","fus allé(e)","fut allé(e)","fûmes allé(e)s","fûtes allé(e)(s)","furent allé(e)s"],sp:["aille","ailles","aille","allions","alliez","aillent"],si:["allasse","allasses","allât","allassions","allassiez","allassent"],cp:["irais","irais","irait","irions","iriez","iraient"],cpa:["serais allé(e)","serais allé(e)","serait allé(e)","serions allé(e)s","seriez allé(e)(s)","seraient allé(e)s"],imp:["va","allons","allez"],impp:["sois allé(e)","soyons allé(e)s","soyez allé(e)(s)"],inf:["aller"],infp:["être allé(e)"],part:["allant"],partp:["allé"],ger:["en allant"],gerp:["en étant allé"]},
+"faire":{p:["fais","fais","fait","faisons","faites","font"],i:["faisais","faisais","faisait","faisions","faisiez","faisaient"],f:["ferai","feras","fera","ferons","ferez","feront"],ps:["fis","fis","fit","fîmes","fîtes","firent"],pc:["ai fait","as fait","a fait","avons fait","avez fait","ont fait"],pq:["avais fait","avais fait","avait fait","avions fait","aviez fait","avaient fait"],fa:["aurai fait","auras fait","aura fait","aurons fait","aurez fait","auront fait"],pa:["eus fait","eus fait","eut fait","eûmes fait","eûtes fait","eurent fait"],sp:["fasse","fasses","fasse","fassions","fassiez","fassent"],si:["fisse","fisses","fît","fissions","fissiez","fissent"],cp:["ferais","ferais","ferait","ferions","feriez","feraient"],cpa:["aurais fait","aurais fait","aurait fait","aurions fait","auriez fait","auraient fait"],imp:["fais","faisons","faites"],impp:["aie fait","ayons fait","ayez fait"],inf:["faire"],infp:["avoir fait"],part:["faisant"],partp:["fait"],ger:["en faisant"],gerp:["en ayant fait"]}
+};
+const regular=["parler","aimer","chanter","jouer","regarder","travailler","finir","choisir","grandir","réussir","prendre","venir","voir","dire","lire","écrire","mettre","partir","dormir","courir"];
+function addRegular(v){if(verbs[v])return;let er=v.endsWith("er"),stem=er?v.slice(0,-2):v,d={};if(er){d.p=[stem+"e",stem+"es",stem+"e",stem+"ons",stem+"ez",stem+"ent"];d.i=[stem+"ais",stem+"ais",stem+"ait",stem+"ions",stem+"iez",stem+"aient"];d.f=[v+"ai",v+"as",v+"a",v+"ons",v+"ez",v+"ont"];d.ps=[stem+"ai",stem+"as",stem+"a",stem+"âmes",stem+"âtes",stem+"èrent"];d.sp=[stem+"e",stem+"es",stem+"e",stem+"ions",stem+"iez",stem+"ent"];d.cp=[v+"ais",v+"ais",v+"ait",v+"ions",v+"iez",v+"aient"];d.part=[stem+"ant"];d.ger=["en "+stem+"ant"]}else{d.p=[stem+"s",stem+"s",stem+"t",stem+"ons",stem+"ez",stem+"ent"];d.i=[stem+"ais",stem+"ais",stem+"ait",stem+"ions",stem+"iez",stem+"aient"];d.f=[v+"ai",v+"as",v+"a",v+"ons",v+"ez",v+"ont"];d.ps=[stem+"is",stem+"is",stem+"it",stem+"îmes",stem+"îtes",stem+"irent"];d.sp=[stem+"e",stem+"es",stem+"e",stem+"ions",stem+"iez",stem+"ent"];d.cp=[v+"ais",v+"ais",v+"ait",v+"ions",v+"iez",v+"aient"];d.part=[stem+"ant"];d.ger=["en "+stem+"ant"]}const pp={parler:"parlé",aimer:"aimé",chanter:"chanté",jouer:"joué",regarder:"regardé",travailler:"travaillé",finir:"fini",choisir:"choisi",grandir:"grandi",réussir:"réussi",prendre:"pris",venir:"venu",voir:"vu",dire:"dit",lire:"lu",écrire:"écrit",mettre:"mis",partir:"parti",dormir:"dormi",courir:"couru"}[v]||stem+"é";const aux=["venir","partir"].includes(v)?"être":"avoir",a=verbs[aux];d.pc=a.p.map(x=>x+" "+pp);d.pq=a.i.map(x=>x+" "+pp);d.fa=a.f.map(x=>x+" "+pp);d.pa=a.ps.map(x=>x+" "+pp);d.cpa=d.cp.map(x=>x+" "+pp);d.si=d.sp.map(x=>x.replace(/e$/,"asse"));d.imp=[d.p[1],d.p[3],d.p[4]];d.impp=["aie "+pp,"ayons "+pp,"ayez "+pp];d.inf=[v];d.infp=[aux+" "+pp];d.partp=[pp];d.gerp=["en "+aux+" "+pp];verbs[v]=d}
+regular.forEach(addRegular);
+
+const PERSONAL=[
+["INDICATIF",[["Présent","p"],["Imparfait","i"],["Futur","f"],["Passé simple","ps"],["Passé composé","pc"],["Plus-que-parfait","pq"],["Futur antérieur","fa"],["Passé antérieur","pa"]]],
+["SUBJONCTIF",[["Présent","sp"],["Imparfait","si"],["Passé","sp2"],["Plus-que-parfait","si2"]]],
+["CONDITIONNEL",[["Présent","cp"],["Passé","cpa"]]],
+["IMPÉRATIF",[["Présent","imp"],["Passé","impp"]]]
+];
+const TOP=[
+["INDICATIF",[["Présent","p"],["Imparfait","i"],["Futur","f"],["Passé simple","ps"]]],
+["SUBJONCTIF",[["Présent","sp"],["Imparfait","si"]]],
+["CONDITIONNEL",[["Présent","cp"]]],
+["IMPÉRATIF",[["Présent","imp"]]]
+];
+const BOTTOM=[
+["INDICATIF",[["Passé composé","pc"],["Plus-que-parfait","pq"],["Futur antérieur","fa"],["Passé antérieur","pa"]]],
+["SUBJONCTIF",[["Passé","sp2"],["Plus-que-parfait","si2"]]],
+["CONDITIONNEL",[["Passé","cpa"]]],
+["IMPÉRATIF",[["Passé","impp"]]]
+];
+const IMP=[
+["INFINITIF",[["Présent","inf"],["Passé","infp"]]],
+["PARTICIPE",[["Présent","part"],["Passé","partp"]]],
+["GERONDIF",[["Présent","ger"],["Passé","gerp"]]]
+];
+
+const select=document.getElementById("verbSelect"), tables=document.getElementById("tables"), score=document.getElementById("score");
+Object.keys(verbs).sort((a,b)=>a.localeCompare(b,"fr")).forEach(v=>{let o=document.createElement("option");o.value=v;o.textContent=v;select.appendChild(o);});
+
+function choices(container,groups){
+ container.innerHTML="";
+ groups.forEach(([g,items])=>items.forEach(([label,key])=>{
+  let l=document.createElement("label");l.className="choice";
+  l.innerHTML='<input type="checkbox" data-mode="'+key+'"><span>'+g+" — "+label+'</span>';
+  container.appendChild(l);
+ }));
+}
+function selected(k){let x=document.querySelector('[data-mode="'+k+'"]');return !!(x&&x.checked);}
+function setModes(keys){document.querySelectorAll("[data-mode]").forEach(x=>x.checked=keys.includes(x.dataset.mode));build();}
+function allKeys(){return [...PERSONAL.flatMap(x=>x[1]),...IMP.flatMap(x=>x[1])].map(x=>x[1]);}
+function chosen(groups){return groups.map(([g,items])=>[g,items.filter(([l,k])=>selected(k))]).filter(x=>x[1].length);}
+function exactWorksheet(){
+ const topMap=new Map(TOP.flatMap(([g,items])=>items.map(([l,k])=>[k,[g,l]])));
+ const botMap=new Map(BOTTOM.flatMap(([g,items])=>items.map(([l,k])=>[k,[g,l]])));
+ const topCols=TOP.flatMap(x=>x[1]);
+ const botCols=BOTTOM.flatMap(x=>x[1]);
+ let h='<table class="worksheet"><colgroup>'+Array(8).fill('<col>').join('')+'</colgroup>';
+
+ // Header row: INDICATIF / SUBJONCTIF / CONDITIONNEL / IMPÉRATIF
+ h+='<tr>';
+ TOP.forEach(([g,items])=>h+='<th class="group" colspan="'+items.length+'">'+g+'</th>');
+ h+='</tr>';
+
+ // Upper labels
+ h+='<tr>';
+ topCols.forEach(([label,key])=>h+='<th class="sub">'+label+'</th>');
+ h+='</tr>';
+
+ // Upper writing band
+ h+='<tr>';
+ topCols.forEach(([label,key])=>{
+   const active=selected(key);
+   h+='<td class="upper-cell '+(active?'':'inactive')+'">';
+   if(active) h+='<textarea spellcheck="false" data-key="'+key+'" data-count="'+((key==="imp")?3:6)+'"></textarea>';
+   h+='</td>';
+ });
+ h+='</tr>';
+
+ // Lower labels: same 8 columns, exactly as in the supplied PDF.
+ h+='<tr>';
+ botCols.forEach(([label,key])=>h+='<th class="lower-head '+(selected(key)?'':'inactive')+'">'+label+'</th>');
+ h+='</tr>';
+
+ // Lower writing band
+ h+='<tr>';
+ botCols.forEach(([label,key])=>{
+   const active=selected(key);
+   h+='<td class="lower-cell '+(active?'':'inactive')+'">';
+   if(active) h+='<textarea spellcheck="false" data-key="'+key+'" data-count="'+((key==="impp")?3:6)+'"></textarea>';
+   h+='</td>';
+ });
+ h+='</tr></table>';
+
+ return h;
+}
+function impTable(){
+ const chosen=IMP.flatMap(([g,items])=>items);
+ let h='<table class="worksheet imp-table"><tr>';
+ // The supplied PDF groups these as 2+2+2 columns.
+ h+='<th class="imp-group" colspan="2">INFINITIF</th><th class="imp-group" colspan="2">PARTICIPE</th><th class="imp-group" colspan="2">GERONDIF</th></tr><tr>';
+ chosen.forEach(([label,key])=>h+='<th class="imp-sub">'+label+'</th>');
+ h+='</tr><tr>';
+ chosen.forEach(([label,key])=>{
+   const active=selected(key);
+   h+='<td class="imp-cell '+(label==="Passé"?'shade ':'')+(active?'':'inactive')+'">';
+   if(active) h+='<textarea spellcheck="false" data-key="'+key+'" data-count="1"></textarea>';
+   h+='</td>';
+ });
+ h+='</tr></table>';
+ return h;
+}
+function build(){
+ document.getElementById("verbName").textContent=select.value;
+ tables.innerHTML=exactWorksheet()+impTable();
+ score.textContent="Score : —";
+}
+function expected(k){let d=verbs[select.value];return d[k]||[];}
+function lines(s){return String(s||"").replace(/\r/g,"").split(/\n+/).map(x=>x.trim()).filter(Boolean);}
+function norm(s){return String(s||"").toLowerCase().trim().replace(/[’']/g,"'").replace(/\s+/g," ");}
+function equal(a,b){
+ let x=norm(a),y=norm(b);if(x===y)return true;
+ x=x.replace(/\(e\)/g,"").replace(/\(s\)/g,"").replace(/\s+/g," ").trim();
+ y=y.replace(/\(e\)/g,"").replace(/\(s\)/g,"").replace(/\s+/g," ").trim();
+ return x===y;
+}
+function check(){
+ let good=0,total=0;
+ document.querySelectorAll("textarea[data-key]").forEach(a=>{
+  let e=expected(a.dataset.key),v=lines(a.value);a.classList.remove("correct","wrong","answer");
+  e.forEach((x,i)=>{total++;if(equal(v[i]||"",x))good++;});
+  if(v.length===e.length&&e.every((x,i)=>equal(v[i],x)))a.classList.add("correct");else a.classList.add("wrong");
+ });
+ score.textContent=total?"Score : "+Math.round(good/total*18)+"/18 · "+good+"/"+total+" ("+Math.round(good/total*100)+" %)":"Score : —";
+}
+function answers(){document.querySelectorAll("textarea[data-key]").forEach(a=>{a.value=expected(a.dataset.key).join("\n");a.classList.remove("correct","wrong");a.classList.add("answer");});}
+function resetAll(){document.querySelectorAll("textarea[data-key]").forEach(a=>{a.value="";a.classList.remove("correct","wrong","answer");});score.textContent="Score : —";}
+document.getElementById("allBtn").onclick=()=>setModes(allKeys());
+document.getElementById("noneBtn").onclick=()=>setModes([]);
+document.getElementById("personalBtn").onclick=()=>setModes(PERSONAL.flatMap(x=>x[1]).map(x=>x[1]));
+document.getElementById("impersonalBtn").onclick=()=>setModes(IMP.flatMap(x=>x[1]).map(x=>x[1]));
+document.getElementById("checkBtn").onclick=check;
+document.getElementById("answerBtn").onclick=answers;
+document.getElementById("resetBtn").onclick=resetAll;
+document.getElementById("printBtn").onclick=()=>window.print();
+select.onchange=()=>build();
+
+choices(document.getElementById("personalChoices"),PERSONAL);
+choices(document.getElementById("impersonalChoices"),IMP);
+document.querySelectorAll("[data-mode]").forEach(x=>x.addEventListener("change",build));
+select.value="être";
+setModes(PERSONAL.flatMap(x=>x[1]).map(x=>x[1]).slice(0,8));
+</script>
+</body>
+</html>
